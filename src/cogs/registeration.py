@@ -29,7 +29,7 @@ class Registration(commands.Cog):
         for code in reference_codes:
             self.bot.cursor.execute(
                 'INSERT INTO reference_codes (code) VALUES (%s) ON CONFLICT DO NOTHING',
-                (code,)
+                (code, )
             )
         self.bot.conn.commit()
 
@@ -142,7 +142,7 @@ class Registration(commands.Cog):
 
 
         # Fetch all reference codes from the database
-        self.bot.cursor.execute('SELECT * FROM reference_codes')
+        self.bot.cursor.execute('SELECT * FROM reference_codes') 
         reference_codes = {row['code']:row['used'] for row in self.bot.cursor.fetchall()}
 
         form = RegistrationForm(self.bot, reference_codes)

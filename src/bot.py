@@ -11,8 +11,10 @@ from psycopg2.extras import RealDictCursor
 logging.basicConfig(level=logging.INFO)
 
 # Load environment variables
+
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 DATABASE_URL = os.getenv('DATABASE_URL')
+GUILD_ID = os.getenv('GUILD_ID')
 
 initial_extensions = [f'cogs.{c[:-3]}' for c in os.listdir('cogs') if c.endswith('.py')]
 
@@ -69,7 +71,7 @@ class Bot(commands.Bot):
         print("Bot is ready.")
 
 if __name__ == "__main__":
-    bot = Bot(testing_guild_id=1254760112850210896)
+    bot = Bot(testing_guild_id=GUILD_ID)
 
     @bot.command()
     @commands.is_owner()
