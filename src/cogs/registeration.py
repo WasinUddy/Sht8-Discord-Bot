@@ -35,6 +35,22 @@ class Registration(commands.Cog):
 
         await interaction.response.send_message('Reference codes have been assigned successfully.', ephemeral=True)
 
+    @app_commands.command(name='reset database', description='Admin command to reset the database')
+    async def reset_database(self, interaction: discord.Interaction):
+        # If caller is not admin, return
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message('You do not have permission to use this command.', ephemeral=True)
+            return
+
+        # Reset the database
+        self.bot.cursor.execute('DROP TABLE IF EXISTS registrations')
+        self.bot.cursor.execute('DROP TABLE IF EXISTS reference_codes')
+        self.bot.conn.commit()
+
+        self.bot.initialize_database()
+
+        await interaction.response.send_message('Database has been reset successfully.', ephemeral=True)
+
     @app_commands.command(name='register', description='Register with the provided reference code')
     async def register(self, interaction: discord.Interaction):
         class RegistrationForm(ui.Modal, title='ลงทะเบียน'):
@@ -78,9 +94,13 @@ class Registration(commands.Cog):
                     return
 
                 # Check if the reference code exists in the database
-                if self.reference_code.value.upper() not in self.reference_codes:
+                if self.reference_code.value.upper() not in self.reference_codes.keys():
                     await interaction.response.send_message('Invalid reference code. Please check your reference code and try again.', ephemeral=True)
                     return        
+                
+                if self.reference_codes[self.reference_code.value.upper()] == True:
+                    await interaction.response.send_message('Reference code has already been used.', ephemeral=True)
+                    return
 
                 # Validate T-Shirt size (must be one of XS, S, M, L, XL, XXL, etc.)
                 if not re.match(r'^(X*S|M|L|X*L)$', self.tshirt_size.value.upper()):
@@ -101,15 +121,29 @@ class Registration(commands.Cog):
                        VALUES (%s, %s, %s, %s, %s)''',
                     (interaction.user.id, self.reference_code.value.upper(), self.allergy.value or None, self.tshirt_size.value.upper(), single_value)
                 )
+
+                self.bot.cursor.execute(
+                    'UPDATE reference_codes SET used = TRUE WHERE code = %s',
+                    (self.reference_code.value.upper(),)
+                )
+
                 self.bot.conn.commit()
                 
                 await interaction.response.send_message('ลงทะเบียนสำเร็จแล้ว', ephemeral=True)
 
+                # Assign role to the user
+                guild = self.bot.get_guild(interaction.guild.id)
+
+                role = discord.utils.get(guild.roles, name='onsite participant')
+
+                await interaction.user.add_roles(role)
+
+
+
+
         # Fetch all reference codes from the database
-        self.bot.cursor.execute('SELECT code FROM reference_codes')
-        reference_codes = [row['code'] for row in self.bot.cursor.fetchall()]
-
-
+        self.bot.cursor.execute('SELECT * FROM reference_codes')
+        reference_codes = {row['code']:row['used'] for row in self.bot.cursor.fetchall()}
 
         form = RegistrationForm(self.bot, reference_codes)
         await interaction.response.send_modal(form)

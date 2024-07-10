@@ -41,6 +41,7 @@ class Bot(commands.Bot):
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS reference_codes (
             code TEXT PRIMARY KEY
+            used BOOLEAN DEFAULT FALSE
         )                 
         ''')
 
