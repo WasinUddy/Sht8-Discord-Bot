@@ -83,7 +83,7 @@ class Registration(commands.Cog):
             single = ui.TextInput(
                 label='Single or Taken (โสดหรือไม่)',
                 style=discord.TextStyle.short,
-                placeholder='Y/N (Optional)',
+                placeholder='Y/N Y = Single (Optional)',
                 required=False
             )
 
