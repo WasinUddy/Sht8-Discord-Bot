@@ -35,8 +35,8 @@ class Registration(commands.Cog):
 
         await interaction.response.send_message('Reference codes have been assigned successfully.', ephemeral=True)
 
-    @app_commands.command(name='reset database', description='Admin command to reset the database')
-    async def reset_database(self, interaction: discord.Interaction):
+    @app_commands.command(name='reset', description='Admin command to reset the database')
+    async def reset(self, interaction: discord.Interaction):
         # If caller is not admin, return
         if not interaction.user.guild_permissions.administrator:
             await interaction.response.send_message('You do not have permission to use this command.', ephemeral=True)

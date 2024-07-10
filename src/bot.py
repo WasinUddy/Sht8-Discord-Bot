@@ -40,7 +40,7 @@ class Bot(commands.Bot):
 
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS reference_codes (
-            code TEXT PRIMARY KEY
+            code TEXT PRIMARY KEY,
             used BOOLEAN DEFAULT FALSE
         )                 
         ''')
@@ -62,6 +62,7 @@ class Bot(commands.Bot):
                 self.tree.copy_global_to(guild=guild)
                 await self.tree.sync(guild=guild)
             except discord.errors.Forbidden as e:
+                logging.error("Bot does not have permissions to sync commands in the testing guild.")
                 logging.warning(e)
 
     async def on_ready(self):
