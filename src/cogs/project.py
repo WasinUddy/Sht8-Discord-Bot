@@ -31,8 +31,9 @@ class Project(commands.Cog):
         self.bot.cursor.execute('''
         INSERT INTO projects (team_name, project_name, project_url, project_description, thumbnail_url) 
         VALUES (%s, %s, %s, %s, %s) 
-        ON CONFLICT (team_name, project_name) 
+        ON CONFLICT (team_name) 
         DO UPDATE SET 
+            project_name = EXCLUDED.project_name
             project_url = EXCLUDED.project_url, 
             project_description = EXCLUDED.project_description, 
             thumbnail_url = EXCLUDED.thumbnail_url
