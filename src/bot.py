@@ -47,7 +47,25 @@ class Bot(commands.Bot):
         )                 
         ''')
 
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS teams (
+            team_name TEXT PRIMARY KEY,
+            member_ids BIGINT[] NOT NULL
+        )
+        ''')
+
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS projects (
+            team_name TEXT PRIMARY KEY,
+            project_name TEXT NOT NULL,
+            project_url TEXT NOT NULL,
+            project_description TEXT NOT NULL,
+            thumbnail_url TEXT NOT NULL
+        )
+        ''')
+
         self.conn.commit()
+
 
     async def setup_hook(self):
         for extension in initial_extensions:
