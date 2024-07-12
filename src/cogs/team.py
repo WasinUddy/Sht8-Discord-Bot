@@ -90,5 +90,15 @@ class Team(commands.Cog):
         role = discord.utils.get(guild.roles, name=team['team_name'])
         await member.remove_roles(role)
 
+        # if team is empty, delete the team
+        if len(member_ids) == 0:
+            self.bot.cursor.execute('DELETE FROM teams WHERE team_name = %s', (team['team_name'], ))
+            self.bot.conn.commit()
+
+            # Delete the role
+            await role.delete()
+            await interaction.response.send_message('You have left the team. The team has been deleted.', ephemeral=True)
+            return
+
         await interaction.response.send_message('You have left the team.', ephemeral=True)
         
