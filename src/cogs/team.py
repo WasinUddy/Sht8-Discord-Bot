@@ -100,6 +100,23 @@ class Team(commands.Cog):
 
         await interaction.response.send_message('You have left the team.', ephemeral=True)
 
+    @app_commands.command(name='team_info', description='Get information about a team')
+    async def team_info(self, interaction: discord.Interaction, team_role: discord.Role):
+        # Check if the team exists
+        self.bot.cursor.execute('SELECT * FROM teams WHERE team_name = %s', (team_role.name, ))
+        team = self.bot.cursor.fetchone()
+        if not team:
+            await interaction.response.send_message('Team does not exist.', ephemeral=True)
+            return
+
+        # Get the team members
+        members = []
+        for member_id in team['member_ids']:
+            member = interaction.guild.get_member(member_id)
+            members.append(member.mention)
+
+        await interaction.response.send_message(f'Team {team_role.name} has the following members: {", ".join(members)}', ephemeral=True)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Team(bot))
