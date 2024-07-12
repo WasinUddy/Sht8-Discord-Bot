@@ -12,7 +12,7 @@ class Team(commands.Cog):
         # Check if the user is already in a team
         self.bot.cursor.execute('SELECT * FROM teams WHERE %s = ANY(member_ids)', (interaction.user.id, ))
         if self.bot.cursor.fetchone():
-            await interaction.response.send_message('You are already in a team. use /leave to leave your existing team', ephemeral=True)
+            await interaction.response.send_message('You are already in a team. use /leave_team to leave your existing team', ephemeral=True)
             return
         
         # Check if the team name is already taken
@@ -28,9 +28,7 @@ class Team(commands.Cog):
         # Create the team role
         role = await interaction.guild.create_role(name=team_name)
 
-        # Add the role to the user
-        member = interaction.guild.get_member(interaction.user.id)
-        await member.add_roles(role)
+        await interaction.user.add_roles(role)
 
         await interaction.response.send_message(f'Team {team_name} created successfully.', ephemeral=True)
 
