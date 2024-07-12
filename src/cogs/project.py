@@ -28,7 +28,15 @@ class Project(commands.Cog):
             return
 
         # Submit the project
-        self.bot.cursor.execute('INSERT INTO projects (team_name, project_name, project_url, project_description, thumbnail_url) VALUES (%s, %s, %s, %s, %s)', (team['team_name'], project_name, project_url, project_description, thumbnail_url))
+        self.bot.cursor.execute('''
+        INSERT INTO projects (team_name, project_name, project_url, project_description, thumbnail_url) 
+        VALUES (%s, %s, %s, %s, %s) 
+        ON CONFLICT (team_name, project_name) 
+        DO UPDATE SET 
+            project_url = EXCLUDED.project_url, 
+            project_description = EXCLUDED.project_description, 
+            thumbnail_url = EXCLUDED.thumbnail_url
+        ''', (team['team_name'], project_name, project_url, project_description, thumbnail_url))
         self.bot.conn.commit()
 
         await interaction.response.send_message('Project submitted successfully.', ephemeral=True)
