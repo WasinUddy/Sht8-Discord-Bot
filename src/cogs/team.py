@@ -101,4 +101,7 @@ class Team(commands.Cog):
             return
 
         await interaction.response.send_message('You have left the team.', ephemeral=True)
-        
+
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Team(bot))

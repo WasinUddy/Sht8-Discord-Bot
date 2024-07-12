@@ -42,3 +42,5 @@ class Project(commands.Cog):
         await interaction.response.send_message('Project submitted successfully.', ephemeral=True)
     
 
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Project(bot))
