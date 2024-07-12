@@ -20,7 +20,7 @@ initial_extensions = [f'cogs.{c[:-3]}' for c in os.listdir('cogs') if c.endswith
 
 class Bot(commands.Bot):
     def __init__(self, testing_guild_id=None):
-        super().__init__(command_prefix=commands.when_mentioned_or("!"), intents=discord.Intents.default())
+        super().__init__(command_prefix=commands.when_mentioned_or("!"), intents=discord.Intents.all())
 
         # Connect to PostgreSQL database using the connection string
         self.conn = psycopg2.connect(DATABASE_URL)
