@@ -62,7 +62,7 @@ class Project(commands.Cog):
     async def vote(self, interaction: discord.Interaction, team_role: discord.Role, rating: int):
         # Check if user is in any team
         self.bot.cursor.execute(
-            'SELECT * FROM teams WHERE %s = ANY(member_ids)', (interaction.user.id))
+            'SELECT * FROM teams WHERE %s = ANY(member_ids)', (interaction.user.id, ))
         team = self.bot.cursor.fetchone()
         if not team:
             await interaction.response.send_message('You need to be in a team to vote!', ephemeral=True)
