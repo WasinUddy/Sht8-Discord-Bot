@@ -59,7 +59,7 @@ class Project(commands.Cog):
         await interaction.response.send_message(f'GitHub Username successfully set to https://github.com/{github_username}', ephemeral=True)
 
     @app_commands.command(name='vote', description='Vote for a project')
-    async def vote(self, interaction: discord.Interaction, team_name: str, rating: int):
+    async def vote(self, interaction: discord.Interaction, team_role: discord.Role, rating: int):
         # Check if user is in any team
         self.bot.cursor.execute(
             'SELECT * FROM teams WHERE %s = ANY(member_ids)', (interaction.user.id))
@@ -74,7 +74,7 @@ class Project(commands.Cog):
         ON CONFLICT (user_id, team_name)
         DO UPDATE SET
             rating = EXCLUDED.rating
-        ''', (interaction.user.id, team_name, rating))
+        ''', (interaction.user.id, team_role.name, rating))
         self.bot.conn.commit()
 
         await interaction.response.send_message(f'Vote submitted', ephemeral=True)
