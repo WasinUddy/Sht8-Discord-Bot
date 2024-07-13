@@ -53,7 +53,8 @@ class Project(commands.Cog):
         ON CONFLICT (user_id)
         DO UPDATE SET
             github_username = EXCLUDED.github_username
-        ''', interaction.user.id, github_username)
+        ''', (interaction.user.id, github_username))
+        self.bot.conn.commit()
 
         await interaction.response.send_message(f'GitHub Username successfully set to https://github.com/{github_username}', ephemeral=True)
 
