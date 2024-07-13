@@ -53,7 +53,8 @@ class Bot(commands.Bot):
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS teams (
             team_name TEXT PRIMARY KEY,
-            member_ids BIGINT[] NOT NULL
+            member_ids BIGINT[] NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         ''')
 
@@ -71,6 +72,15 @@ class Bot(commands.Bot):
         CREATE TABLE IF NOT EXISTS github (
             user_id BIGINT PRIMARY KEY,
             github_username TEXT NOT NULL
+        )
+        ''')
+
+        self.curspr.execute('''
+        CREATE TABLE IF NOT EXISTS vote (
+            user_id BIGINT NOT NULL,
+            team_name TEXT NOT NULL,
+            rating INT NOT NULL,
+            UNIQUE(user_id, team_name)
         )
         ''')
 

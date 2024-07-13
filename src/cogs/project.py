@@ -9,7 +9,7 @@ class Project(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name='submit', description='Submit a project')
-    async def submit(self, interaction: discord.Interaction, project_name: str, project_url: str, project_description: str, thumbnail_url: str):
+    async def submit(self, interaction: discord.Interaction, project_name: str, project_url: str, project_description: str, thumbnail_url: str = ""):
         # None data is null
         if not project_name or not project_url or not project_description or not thumbnail_url:
             await interaction.response.send_message('Please provide all the required fields.', ephemeral=True)
@@ -57,6 +57,27 @@ class Project(commands.Cog):
         self.bot.conn.commit()
 
         await interaction.response.send_message(f'GitHub Username successfully set to https://github.com/{github_username}', ephemeral=True)
+
+    @app_commands.command(name='vote', description='Vote for a project')
+    async def vote(self, interaction: discord.Interaction, team_name: str, rating: int):
+        # Check if user is in any team
+        self.bot.cursor.execute(
+            'SELECT * FROM teams WHERE %s = ANY(member_ids)', (interaction.user.id))
+        team = self.bot.cursor.fetchone()
+        if not team:
+            await interaction.response.send_message('You need to be in a team to vote!', ephemeral=True)
+            return
+
+        self.bot.cursor.execute('''
+        INSERT INTO vote (user_id, team_name, rating)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (user_id, team_name)
+        DO UPDATE SET
+            rating = EXCLUDED.rating
+        ''', (interaction.user.id, team_name, rating))
+        self.bot.conn.commit()
+
+        await interaction.response.send_message(f'Vote submitted', ephemeral=True)
 
 
 async def setup(bot: commands.Bot):
