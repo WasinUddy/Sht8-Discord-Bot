@@ -3,6 +3,7 @@ from discord import app_commands, ui
 from discord.ext import commands
 import re
 
+
 class Project(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -15,14 +16,16 @@ class Project(commands.Cog):
             return
 
         # Check if the user is in a team
-        self.bot.cursor.execute('SELECT * FROM teams WHERE %s = ANY(member_ids)', (interaction.user.id, ))
+        self.bot.cursor.execute(
+            'SELECT * FROM teams WHERE %s = ANY(member_ids)', (interaction.user.id, ))
         team = self.bot.cursor.fetchone()
         if not team:
             await interaction.response.send_message('You are not in a team. Create or join a team to submit a project.', ephemeral=True)
             return
 
         # Check if the project name is already taken
-        self.bot.cursor.execute('SELECT * FROM projects WHERE project_name = %s', (project_name, ))
+        self.bot.cursor.execute(
+            'SELECT * FROM projects WHERE project_name = %s', (project_name, ))
         if self.bot.cursor.fetchone():
             await interaction.response.send_message('Project name is already taken.', ephemeral=True)
             return
@@ -41,7 +44,17 @@ class Project(commands.Cog):
         self.bot.conn.commit()
 
         await interaction.response.send_message('Project submitted successfully.', ephemeral=True)
-    
+
+    @app_commands.command(name='set_github', description='Set your GitHub username')
+    async def set_github(self, interaction: discord.Interaction, github_username: str):
+        self.bot.cursor.execute('''
+        INSERT INTO github (user_id, github_username)
+        VALUES (%s, %s)
+        ON CONFLICT (user_id)
+        DO UPDATE SET
+            github_username = EXCLUDED.github_username
+        ''', interaction.user.id, github_username)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Project(bot))
