@@ -75,7 +75,7 @@ class Bot(commands.Bot):
         )
         ''')
 
-        self.curspr.execute('''
+        self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS vote (
             user_id BIGINT NOT NULL,
             team_name TEXT NOT NULL,
