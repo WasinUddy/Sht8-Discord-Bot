@@ -55,6 +55,8 @@ class Project(commands.Cog):
             github_username = EXCLUDED.github_username
         ''', interaction.user.id, github_username)
 
+        await interaction.response.send_message(f'GitHub Username successfully set to https://github.com/{github_username}', ephemeral=True)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Project(bot))
