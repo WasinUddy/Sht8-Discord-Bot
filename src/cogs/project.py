@@ -68,6 +68,10 @@ class Project(commands.Cog):
             await interaction.response.send_message('You need to be in a team to vote!', ephemeral=True)
             return
 
+        if rating < 0 or rating > 3:
+            await interaction.response.send_message('Rating should be between 0 and 3', ephemeral=True)
+            return
+
         self.bot.cursor.execute('''
         INSERT INTO vote (user_id, team_name, rating)
         VALUES (%s, %s, %s)
